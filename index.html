@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Levenshteinenator</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700italic,700' rel='stylesheet' type='text/css'>
+
+	<script src="./js/levenshtein.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+
+
+	// templating function based on http://snipt.org/rpp
+	function Template(str) {
+		this.rgx = /\{\{([^{}]*)\}\}/g;
+		this.str = str || '';
+	}
+	Template.prototype.evaluate = function (vals) {
+		vals = vals || {};
+		function repr(str, match) {
+			return 'string' === typeof vals[match] || 'number' === typeof vals[match] ? vals[match] : str;
+		};
+		return this.str.replace(this.rgx, repr);
+	};
+
+	function getLevenshteinenated(fob) {
+		// start timer
+		var start = (new Date).getTime();
+
+		// get distance
+		var distArray = levenshteinenator(fob.string_a.value, fob.string_b.value);
+		var dist = distArray[ distArray.length - 1 ][ distArray[ distArray.length - 1 ].length - 1 ];
+
+		// stop timer
+		var stop = (new Date).getTime();
+
+		// display distance
+		fob.result.value = dist;
+
+		// display elapsed time
+	//	fob.elapsed.value = stop - start;
+
+		// display distance
+		fob.result1.value = ((distArray.length - 1) - dist) / (distArray.length - 1) * 100;
+
+		// display table
+		var tmpls = {
+			table : new Template('<table>{{rows}}</table>'),
+			row   : new Template('<tr>{{cells}}</tr>'),
+			cell  : new Template('<td>{{distance}}</td>')
+		};
+
+		var cells, rows = '';
+		for ( var r = 0; r < distArray.length; ++r ) {
+			cells = '';
+			for ( var c = 0; c < distArray[ distArray.length - 1 ].length; ++c ) {
+				cells += tmpls.cell.evaluate({ distance : distArray[r][c] });
+			}
+			rows += tmpls.row.evaluate({ cells : cells })
+		}
+		var html = tmpls.table.evaluate({ rows : rows });
+
+		document.getElementById('resultHTML').innerHTML = html;
+	}
+	</script>
+	
+</head>
+<body>
+
+<div class="title">
+<h1 align="center">
+	Levenshteinenator
+</h1>
+</div>
+
+<p align="center">
+	Enter two strings in the fields below, then click “Levenshteinenate me!” <br>The Levenshteinenator will then compute the mistakes available (the Levenshtein distance between the two strings).
+</p>
+
+<hr>
+<div id="form">
+<div class="wrapper">
+	<form onsubmit="getLevenshteinenated(this);return false;">
+		<div class="field">
+			<label>Workers Input</label><br>
+			<input type="text" size="40" maxlength="5000" name="string_a" value="">		
+		</div>		
+		<div class="field">	
+			<label>Expected Result</label><br>
+			<input type="text" size="40" maxlength="5000" name="string_b" value="">
+			<br>
+		</div>
+		<div class="field">
+			<label>Mistakes Found</label><br>
+			<input type="text1" size="10" name="result" value="" disabled="true">
+		</div>
+	<!--	<div class="field">	
+			<label>Elapsed Time (ms)</label><br>
+			<input type="text1" size="10" name="elapsed" value="" disabled="true"><br>
+		</div> -->
+
+		<div class="field">	
+			<label>Percentage Score</label><br>
+			<input type="text1" size="10" name="result1" value="" disabled="true"><br>
+		</div>
+		<div class="actions">
+			<input type="submit" class="button button_highlight button_block" value="Levenshteinenate me!" onclick="getLevenshteinenated(this.form);">
+		</div>
+	</form>
+</div>
+</div>
+<hr>
+
+<div id="resultHTML"></div>
+
+<div style="clear: both;"></div>
+
+<script type="text/javascript" charset="utf-8">
+
+// do this here so we're not stuck waiting for the page counter to load
+init();
+
+</script>
+
+<hr>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+
+<p align="center" class="footer">
+    Copyright © 2016. All rights reserved.
+</p>
+</body></html>
