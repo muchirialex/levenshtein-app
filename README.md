@@ -1,7 +1,7 @@
 ## Levenshteinator App
 
 **Authors**
-Alex Muchiri
+- Alex Muchiri
 
 **Technologies**
 - HTML
